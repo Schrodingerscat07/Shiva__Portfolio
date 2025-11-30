@@ -7,8 +7,8 @@ import {
 
 export const HERO_CONTENT = {
     name: "SHIVA",
-    tagline: "Quant & ML Engineer",
-    description: "Crafting intelligent systems at the intersection of finance and technology.",
+    tagline: "Machine Learning & Computer Vision",
+    description: "Crafting intelligent systems with deep learning and vision.",
     resumeLink: "#",
     socialLinks: {
         github: "https://github.com",

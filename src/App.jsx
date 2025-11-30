@@ -2,6 +2,7 @@ import React, { Suspense, useRef, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Tilt } from 'react-tilt';
+import { FaGithub } from 'react-icons/fa';
 import AnimatedBackground from './components/AnimatedBackground';
 import { HERO_CONTENT, TIMELINE_DATA, PROJECTS, SOCIAL_LINKS } from './constants/data';
 import './index.css';
@@ -105,7 +106,7 @@ function App() {
         {/* Top Left: Name */}
         <div className="fixed top-8 left-8 z-50 mix-blend-difference">
           <span
-            className="font-japanese font-bold text-2xl tracking-tighter text-white cursor-pointer"
+            className="font-japanese font-bold text-xl tracking-tighter text-white cursor-pointer"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
             SHIVA
@@ -115,12 +116,12 @@ function App() {
         {/* Top Right: Socials & Resume */}
         <div className="fixed top-8 right-8 z-50 flex items-center gap-6 mix-blend-difference">
           {SOCIAL_LINKS.map((link) => (
-            <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors font-japanese text-sm uppercase tracking-widest">
+            <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors font-japanese text-xs uppercase tracking-widest">
               {link.name}
             </a>
           ))}
           <div className="h-4 w-[1px] bg-white/20"></div>
-          <a href={HERO_CONTENT.resumeLink} className="text-white/70 hover:text-white transition-colors font-japanese text-sm uppercase tracking-widest cursor-pointer">
+          <a href={HERO_CONTENT.resumeLink} className="text-white/70 hover:text-white transition-colors font-japanese text-xs uppercase tracking-widest cursor-pointer">
             Resume
           </a>
         </div>
@@ -137,7 +138,7 @@ function App() {
           >
             {/* Huge Title with Blur/Glow Effect */}
             <h1
-              className="font-japanese text-[12rem] md:text-[16rem] leading-none font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/80 mix-blend-overlay"
+              className="font-japanese text-[10rem] md:text-[13rem] leading-none font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/80 mix-blend-overlay"
               style={{
                 filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.5)) blur(1px)',
                 WebkitTextStroke: '1px rgba(255,255,255,0.2)'
@@ -147,7 +148,7 @@ function App() {
             </h1>
 
             {/* Subtitle */}
-            <p className="font-japanese text-2xl md:text-3xl text-white/90 mt-8 mb-24 tracking-widest uppercase font-light">
+            <p className="font-japanese text-xl md:text-2xl text-white/90 mt-8 mb-24 tracking-widest uppercase font-light">
               {HERO_CONTENT.tagline}
             </p>
 
@@ -155,7 +156,7 @@ function App() {
             <div className="flex gap-8 items-center">
               <MagneticButton
                 onClick={() => document.getElementById('journey').scrollIntoView({ behavior: 'smooth' })}
-                className="px-8 py-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-japanese text-lg hover:bg-white/10 transition-all duration-300 min-w-[140px]"
+                className="px-6 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-japanese text-base hover:bg-white/10 transition-all duration-300 min-w-[120px]"
               >
                 Journey
               </MagneticButton>
@@ -164,131 +165,96 @@ function App() {
 
               <MagneticButton
                 onClick={() => document.getElementById('projects').scrollIntoView({ behavior: 'smooth' })}
-                className="px-8 py-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-japanese text-lg hover:bg-white/10 transition-all duration-300 min-w-[140px]"
+                className="px-6 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-japanese text-base hover:bg-white/10 transition-all duration-300 min-w-[120px]"
               >
                 Works
               </MagneticButton>
             </div>
 
             {/* Small Description at bottom */}
-            <p className="absolute bottom-12 text-white/40 font-japanese text-sm max-w-md leading-relaxed">
+            <p className="absolute bottom-12 text-white/40 font-japanese text-xs max-w-md leading-relaxed">
               {HERO_CONTENT.description}
             </p>
           </motion.div>
         </Section>
 
-        {/* Timeline Section */}
-        <Section className="py-20" id="journey">
-          <h2 className="font-display text-4xl font-bold mb-20 text-center italic text-white/90 hover:text-white transition-colors duration-300 drop-shadow-lg">Journey</h2>
+        {/* Journey Section */}
+        <Section id="journey" className="min-h-screen flex items-center justify-center relative py-20">
+          <div className="max-w-4xl w-full relative z-10">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="font-japanese text-4xl md:text-5xl font-bold text-white mb-16 text-center"
+            >
+              Journey
+            </motion.h2>
 
-          <div className="relative max-w-4xl mx-auto px-4">
-            {/* Continuous Line Background */}
-            <div className="absolute left-[27px] top-0 bottom-0 w-[2px] bg-white/10 md:left-1/2 md:-ml-[1px]" />
-
-            <div className="space-y-16">
+            <div className="relative border-l-2 border-white/10 ml-4 md:ml-0 space-y-12">
               {TIMELINE_DATA.map((item, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className={`relative flex flex-col md:flex-row gap-8 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
+                  className="relative pl-8 md:pl-12 group"
                 >
                   {/* Timeline Marker */}
-                  <div className="absolute left-[19px] top-0 md:left-1/2 md:-ml-[8px] z-10">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      whileInView={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 200, damping: 10, delay: 0.2 }}
-                      className="w-4 h-4 rounded-full border-2 border-black shadow-[0_0_10px_rgba(255,215,0,0.5)]"
-                      style={{ backgroundColor: '#FFD700' }} // Gold
-                    >
-                      <motion.div
-                        animate={{ scale: [1, 1.5, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="w-full h-full rounded-full bg-white/30"
-                      />
-                    </motion.div>
+                  <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#FFD700] shadow-[0_0_10px_#FFD700] group-hover:scale-125 transition-transform duration-300" />
+
+                  <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-6 rounded-2xl hover:bg-black/50 transition-all duration-300">
+                    <span className="font-japanese text-[#FFD700] text-sm tracking-wider mb-2 block">{item.year}</span>
+                    <h3 className="font-japanese text-xl font-bold text-white mb-1" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{item.title}</h3>
+                    <p className="font-japanese text-white/80 text-sm mb-2">{item.institution || item.project || item.event}</p>
+                    <p className="font-japanese text-white/60 text-sm leading-relaxed">{item.description}</p>
                   </div>
-
-                  {/* Content Card */}
-                  <div className="ml-12 md:ml-0 md:w-1/2">
-                    <motion.div
-                      initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true, margin: "-100px" }}
-                      transition={{ duration: 0.6, delay: index * 0.1 }}
-                      className={`p-6 rounded-xl border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-[#FFD700]/30 transition-colors duration-500
-                      ${index % 2 === 0 ? 'md:mr-12' : 'md:ml-12'}`}
-                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }} // Light semi-transparent bg
-                    >
-                      {/* Inner Highlight */}
-                      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-                      <span className="inline-block px-3 py-1 rounded-full bg-[#FFD700]/10 border border-[#FFD700]/20 text-[#FFD700] text-xs font-mono font-bold mb-3">
-                        {item.year}
-                      </span>
-
-                      <h3 className="font-display text-2xl font-bold text-white mb-1" style={{ textShadow: '1px 1px 3px #000000' }}>
-                        {item.title}
-                      </h3>
-
-                      {(item.institution || item.project || item.event) && (
-                        <p className="text-white/80 text-sm font-medium mb-3 italic">
-                          {item.institution || item.project || item.event}
-                        </p>
-                      )}
-
-                      <p className="text-white/60 text-sm leading-relaxed font-light">
-                        {item.description}
-                      </p>
-                    </motion.div>
-                  </div>
-
-                  {/* Empty space for the other side */}
-                  <div className="hidden md:block md:w-1/2" />
                 </motion.div>
               ))}
             </div>
           </div>
         </Section>
 
-        {/* Projects Section */}
-        <Section id="projects">
-          <h2 className="font-display text-3xl font-bold mb-16 italic text-white/70 hover:text-white transition-colors duration-300">Selected Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-7xl px-4">
-            {PROJECTS.map((project) => (
-              <Tilt key={project.id} options={{ max: 15, scale: 1.02, speed: 400 }} className="h-full">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-2xl h-full flex flex-col hover:border-white/20 transition-all group shadow-2xl"
-                >
-                  <div className="mb-4 flex justify-between items-start">
-                    <h3 className="font-display text-2xl font-bold text-white/80 group-hover:text-white transition-colors duration-300">{project.title}</h3>
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: project.color }} />
-                  </div>
-                  <p className="text-white/60 group-hover:text-white transition-colors duration-300 mb-6 flex-grow">{project.description}</p>
+        {/* Selected Works Section */}
+        <Section id="projects" className="min-h-screen flex items-center justify-center relative py-20">
+          <div className="max-w-6xl w-full relative z-10 px-4">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="font-japanese text-4xl md:text-5xl font-bold text-black mb-16 text-center"
+            >
+              Selected Works
+            </motion.h2>
 
-                  <div className="mb-6">
-                    <div className="text-xs font-mono text-white/40 group-hover:text-white/60 transition-colors duration-300 mb-2">TECH STACK</div>
-                    <div className="flex flex-wrap gap-2">
-                      {project.tech.map(t => (
-                        <span key={t} className="px-2 py-1 bg-white/5 border border-white/5 rounded text-xs text-white/60 group-hover:text-white transition-colors duration-300 font-medium">{t}</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {PROJECTS.map((project, index) => (
+                <Tilt key={project.id} options={{ max: 15, scale: 1.02, speed: 400 }} className="h-full">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="bg-black/60 backdrop-blur-md border border-white/10 p-6 rounded-2xl h-full hover:border-white/30 transition-all duration-300 group"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="font-japanese text-xl font-bold text-white group-hover:text-[#FFD700] transition-colors">{project.title}</h3>
+                      <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-white transition-colors">
+                        <FaGithub size={20} />
+                      </a>
+                    </div>
+                    <p className="font-japanese text-white/60 text-sm mb-6 leading-relaxed h-20 overflow-hidden">{project.description}</p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {project.tech.map((t) => (
+                        <span key={t} className="px-2 py-1 rounded-md bg-white/5 border border-white/5 text-xs text-white/50 font-japanese">
+                          {t}
+                        </span>
                       ))}
                     </div>
-                  </div>
-
-                  <div className="mt-auto pt-6 border-t border-white/5 flex justify-between items-center">
-                    <span className="text-sm font-mono text-blue-400 font-bold">{project.stat}</span>
-                    <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white hover:underline underline-offset-4 transition-colors duration-300">
-                      View Code &rarr;
-                    </a>
-                  </div>
-                </motion.div>
-              </Tilt>
-            ))}
+                    <div className="pt-4 border-t border-white/5 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: project.color }} />
+                      <span className="font-japanese text-xs text-white/40">{project.stat}</span>
+                    </div>
+                  </motion.div>
+                </Tilt>
+              ))}
+            </div>
           </div>
         </Section>
 
