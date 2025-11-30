@@ -100,50 +100,78 @@ function App() {
           className={`fixed inset-0 pointer-events-none z-0 transition-all duration-1000 ease-in-out ${bgVariant === 'default' ? 'backdrop-blur-sm bg-black/20' : 'backdrop-blur-none bg-transparent'
             }`}
         />
-        <nav className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-black/20 backdrop-blur-md border border-white/10 rounded-full px-12 py-4 flex gap-12 items-center shadow-lg">
-          <span className="font-display font-bold text-2xl tracking-tighter text-white cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>SHIVA</span>
-          <div className="h-6 w-[1px] bg-white/20"></div>
-          <div className="flex gap-8 items-center">
-            <button onClick={() => document.getElementById('journey').scrollIntoView({ behavior: 'smooth' })} className="text-gray-300 hover:text-white transition-colors font-medium text-lg">
-              Journey
-            </button>
-            <button onClick={() => document.getElementById('projects').scrollIntoView({ behavior: 'smooth' })} className="text-gray-300 hover:text-white transition-colors font-medium text-lg">
-              Works
-            </button>
-          </div>
-          <div className="h-6 w-[1px] bg-white/20"></div>
-          <div className="flex gap-6">
-            {SOCIAL_LINKS.map((link) => (
-              <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors font-medium text-lg">
-                {link.name}
-              </a>
-            ))}
-          </div>
-          <MagneticButton className="bg-white text-black px-6 py-2 rounded-full text-base font-semibold hover:bg-gray-200 transition-colors shadow-md">
+        {/* Navigation - Split Layout */}
+
+        {/* Top Left: Name */}
+        <div className="fixed top-8 left-8 z-50 mix-blend-difference">
+          <span
+            className="font-japanese font-bold text-2xl tracking-tighter text-white cursor-pointer"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            SHIVA
+          </span>
+        </div>
+
+        {/* Top Right: Socials & Resume */}
+        <div className="fixed top-8 right-8 z-50 flex items-center gap-6 mix-blend-difference">
+          {SOCIAL_LINKS.map((link) => (
+            <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors font-japanese text-sm uppercase tracking-widest">
+              {link.name}
+            </a>
+          ))}
+          <div className="h-4 w-[1px] bg-white/20"></div>
+          <a href={HERO_CONTENT.resumeLink} className="text-white/70 hover:text-white transition-colors font-japanese text-sm uppercase tracking-widest cursor-pointer">
             Resume
-          </MagneticButton>
-        </nav>
+          </a>
+        </div>
 
         <Section id="hero" className="min-h-screen flex items-center justify-center relative overflow-hidden">
           {/* Gradient Overlay for contrast */}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/60 pointer-events-none z-0" />
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-5xl relative z-10 p-8 rounded-3xl"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="text-center relative z-10 flex flex-col items-center justify-center h-full pt-32"
           >
+            {/* Huge Title with Blur/Glow Effect */}
             <h1
-              className="font-sans text-8xl md:text-9xl font-bold mb-4 tracking-tighter text-white"
-              style={{ textShadow: '0 0 40px rgba(255,255,255,0.4)' }}
+              className="font-japanese text-[12rem] md:text-[16rem] leading-none font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/80 mix-blend-overlay"
+              style={{
+                filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.5)) blur(1px)',
+                WebkitTextStroke: '1px rgba(255,255,255,0.2)'
+              }}
             >
               {HERO_CONTENT.name}
             </h1>
-            <p className="text-3xl md:text-5xl font-medium text-white/60 mb-8 leading-relaxed font-sans tracking-tight">
+
+            {/* Subtitle */}
+            <p className="font-japanese text-2xl md:text-3xl text-white/90 mt-8 mb-24 tracking-widest uppercase font-light">
               {HERO_CONTENT.tagline}
             </p>
-            <p className="text-xl md:text-2xl text-white/40 max-w-3xl mx-auto font-sans">
+
+            {/* Action Buttons: Journey | Works */}
+            <div className="flex gap-8 items-center">
+              <MagneticButton
+                onClick={() => document.getElementById('journey').scrollIntoView({ behavior: 'smooth' })}
+                className="px-8 py-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-japanese text-lg hover:bg-white/10 transition-all duration-300 min-w-[140px]"
+              >
+                Journey
+              </MagneticButton>
+
+              <div className="h-8 w-[1px] bg-white/20"></div>
+
+              <MagneticButton
+                onClick={() => document.getElementById('projects').scrollIntoView({ behavior: 'smooth' })}
+                className="px-8 py-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-japanese text-lg hover:bg-white/10 transition-all duration-300 min-w-[140px]"
+              >
+                Works
+              </MagneticButton>
+            </div>
+
+            {/* Small Description at bottom */}
+            <p className="absolute bottom-12 text-white/40 font-japanese text-sm max-w-md leading-relaxed">
               {HERO_CONTENT.description}
             </p>
           </motion.div>

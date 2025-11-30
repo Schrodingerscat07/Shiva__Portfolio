@@ -10,7 +10,6 @@ const FluidImageShader = {
   uniforms: {
     uTime: { value: 0 },
     uTexture: { value: null },
-    uMouse: { value: new Vector2(0.5, 0.5) },
     uResolution: { value: new Vector2(1, 1) },
     uImageResolution: { value: new Vector2(1, 1) },
     uOpacity: { value: 1.0 }
@@ -89,6 +88,83 @@ const FluidImageShader = {
   `
 };
 
+const SumieShader = {
+  uniforms: {
+    uTime: { value: 0 },
+    uResolution: { value: new Vector2(1, 1) },
+    uOpacity: { value: 1.0 }
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform float uTime;
+    uniform vec2 uResolution;
+    uniform float uOpacity;
+    varying vec2 vUv;
+
+    // Random and Noise functions
+    float random(vec2 st) {
+      return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+    }
+
+    float noise(vec2 st) {
+      vec2 i = floor(st);
+      vec2 f = fract(st);
+      float a = random(i);
+      float b = random(i + vec2(1.0, 0.0));
+      float c = random(i + vec2(0.0, 1.0));
+      float d = random(i + vec2(1.0, 1.0));
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+    }
+
+    #define OCTAVES 6
+    float fbm(vec2 st) {
+      float value = 0.0;
+      float amplitude = .5;
+      float frequency = 0.;
+      for (int i = 0; i < OCTAVES; i++) {
+        value += amplitude * noise(st);
+        st *= 2.;
+        amplitude *= .5;
+      }
+      return value;
+    }
+
+    void main() {
+      vec2 st = vUv;
+      st.x *= uResolution.x/uResolution.y;
+
+      // Domain Warping for Ink Flow
+      vec2 q = vec2(0.);
+      q.x = fbm( st + 0.00 * uTime);
+      q.y = fbm( st + vec2(1.0));
+
+      vec2 r = vec2(0.);
+      r.x = fbm( st + 1.0 * q + vec2(1.7,9.2)+ 0.15 * uTime );
+      r.y = fbm( st + 1.0 * q + vec2(8.3,2.8)+ 0.126 * uTime);
+
+      float f = fbm(st + r);
+
+      // Ink Color Mapping
+      // Mix between dark grey/black ink and paper-like background
+      // For dark mode: Black background, smoky grey/white ink
+      vec3 color = mix(vec3(0.05, 0.05, 0.05), vec3(0.7, 0.7, 0.75), clamp((f*f)*4.0, 0.0, 1.0));
+
+      // Vignette
+      float dist = distance(vUv, vec2(0.5));
+      color *= 1.0 - dist * 0.5;
+
+      gl_FragColor = vec4(color, uOpacity);
+    }
+  `
+};
+
 const BackgroundMesh = ({ shader, opacity, texture }) => {
   const mesh = useRef();
   const { size, viewport } = useThree();
@@ -118,7 +194,9 @@ const BackgroundMesh = ({ shader, opacity, texture }) => {
       mouse.current.x += (pointer.x * 0.5 + 0.5 - mouse.current.x) * 0.1;
       mouse.current.y += (pointer.y * 0.5 + 0.5 - mouse.current.y) * 0.1;
 
-      mesh.current.material.uniforms.uMouse.value.copy(mouse.current);
+      if (mesh.current.material.uniforms.uMouse) {
+        mesh.current.material.uniforms.uMouse.value.copy(mouse.current);
+      }
       mesh.current.material.uniforms.uResolution.value.set(size.width, size.height);
     }
   });
@@ -174,6 +252,15 @@ const FluidMesh = ({ opacity }) => {
   );
 };
 
+const SumieMesh = ({ opacity }) => {
+  return (
+    <BackgroundMesh
+      shader={SumieShader}
+      opacity={opacity}
+    />
+  );
+};
+
 const AnimatedBackground = ({ variant = 'default' }) => {
   return (
     <div className="fixed top-0 left-0 w-full h-full -z-10 bg-black">
@@ -183,8 +270,8 @@ const AnimatedBackground = ({ variant = 'default' }) => {
         gl={{ antialias: false, powerPreference: "high-performance" }} // Disable antialiasing for speed
       >
         <React.Suspense fallback={null}>
-          {/* Fluid Background (Default) */}
-          <FluidMesh opacity={variant === 'default' ? 1.0 : 0.0} />
+          {/* Sumi-e Background (Hero/Default) */}
+          <SumieMesh opacity={variant === 'default' ? 1.0 : 0.0} />
 
           {/* Journey Video Background (Timeline) */}
           <VideoMesh video={journeyVideo} opacity={variant === 'journey' ? 1.0 : 0.0} />

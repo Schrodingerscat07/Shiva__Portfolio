@@ -6,9 +6,15 @@ import {
 } from 'react-icons/fa';
 
 export const HERO_CONTENT = {
-    name: "Shiva",
-    tagline: "Engineering Intelligent Systems",
-    description: "Transforming mathematical theory into production-grade AI. Specializing in Deep Learning and Computer Vision.",
+    name: "SHIVA",
+    tagline: "Quant & ML Engineer",
+    description: "Crafting intelligent systems at the intersection of finance and technology.",
+    resumeLink: "#",
+    socialLinks: {
+        github: "https://github.com",
+        linkedin: "https://linkedin.com",
+        twitter: "https://twitter.com"
+    }
 };
 
 export const TIMELINE_DATA = [
@@ -19,18 +25,7 @@ export const TIMELINE_DATA = [
         description: "Deepening foundations in mathematics and data analysis."
     },
     {
-        year: "2024",
-        title: "Started B-Tech Computer Science",
-        institution: "VNR VJIET",
-        description: "Core computer science engineering."
-    },
-    {
-        year: "2024",
-        title: "Built First ML Project",
-        project: "R Ideologies vs Economic Factors",
-        description: "Analyzed political ideologies' impact on economies."
-    },
-    {
+
         year: "2024",
         title: "ML From Scratch",
         description: "Implemented core algorithms (Regression, etc.) without libraries to understand the math."
