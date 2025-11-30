@@ -43,7 +43,6 @@ const MagneticButton = ({ children, className = "", onClick }) => {
   );
 };
 
-import CustomCursor from './components/CustomCursor';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // ...
@@ -85,8 +84,7 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen text-white font-sans selection:bg-primary selection:text-white overflow-x-hidden cursor-none">
-      <CustomCursor />
+    <div className="min-h-screen text-white font-sans selection:bg-primary selection:text-white overflow-x-hidden">
       {/* 3D Background Layer */}
       <ErrorBoundary>
         <AnimatedBackground variant={bgVariant} />
@@ -188,9 +186,14 @@ function App() {
 
                   {/* Content Card */}
                   <div className="ml-12 md:ml-0 md:w-1/2">
-                    <div className={`p-6 rounded-xl border border-white/10 backdrop-blur-sm relative overflow-hidden group hover:border-[#FFD700]/30 transition-colors duration-500
+                    <motion.div
+                      initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, margin: "-100px" }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      className={`p-6 rounded-xl border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-[#FFD700]/30 transition-colors duration-500
                       ${index % 2 === 0 ? 'md:mr-12' : 'md:ml-12'}`}
-                      style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }} // Dark overlay on content only
+                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }} // Light semi-transparent bg
                     >
                       {/* Inner Highlight */}
                       <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -212,7 +215,7 @@ function App() {
                       <p className="text-white/60 text-sm leading-relaxed font-light">
                         {item.description}
                       </p>
-                    </div>
+                    </motion.div>
                   </div>
 
                   {/* Empty space for the other side */}

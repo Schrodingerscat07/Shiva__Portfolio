@@ -25,7 +25,6 @@ const FluidImageShader = {
   fragmentShader: `
     uniform float uTime;
     uniform sampler2D uTexture;
-    uniform vec2 uMouse;
     uniform vec2 uResolution;
     uniform vec2 uImageResolution;
     uniform float uOpacity;
@@ -71,33 +70,11 @@ const FluidImageShader = {
         vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
       );
 
-      // Mouse interaction
-      vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
-      vec2 mousePos = uMouse * aspect;
-      vec2 uvPos = vUv * aspect;
-      float dist = distance(uvPos, mousePos);
+      // Fluid distortion
+      float noise = snoise(uv * 5.0 + uTime * 0.1);
+      float wave = snoise(uv * 2.0 - uTime * 0.05);
       
-      // Magnifying Glass Effect
-      float radius = 0.8; // Massive radius
-      float magnification = 0.4; // Zoom strength
-      
-      vec2 magnifiedUv = uv;
-      
-      if (dist < radius) {
-        // Calculate distortion
-        // Smoothstep for soft edge
-        float effect = smoothstep(radius, 0.0, dist);
-        
-        // Push pixels away from center to create zoom/magnify effect
-        vec2 direction = uvPos - mousePos;
-        magnifiedUv = uv - (direction * effect * magnification);
-      }
-
-      // Fluid distortion (applied on top of magnification)
-      float noise = snoise(magnifiedUv * 5.0 + uTime * 0.1);
-      float wave = snoise(magnifiedUv * 2.0 - uTime * 0.05);
-      
-      vec2 distortedUv = magnifiedUv + vec2(noise, wave) * 0.01; 
+      vec2 distortedUv = uv + vec2(noise, wave) * 0.01; 
       
       // RGB Shift
       float r = texture2D(uTexture, distortedUv + vec2(0.001, 0.0)).r;
