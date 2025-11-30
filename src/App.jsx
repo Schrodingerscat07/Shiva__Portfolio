@@ -4,6 +4,8 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Tilt } from 'react-tilt';
 import { FaGithub } from 'react-icons/fa';
 import AnimatedBackground from './components/AnimatedBackground';
+import ErrorBoundary from './components/ErrorBoundary';
+import LiquidText from './components/LiquidText';
 import { HERO_CONTENT, TIMELINE_DATA, PROJECTS, SOCIAL_LINKS } from './constants/data';
 import './index.css';
 
@@ -44,15 +46,11 @@ const MagneticButton = ({ children, className = "", onClick }) => {
   );
 };
 
-import ErrorBoundary from './components/ErrorBoundary';
-
-// ...
-
 function App() {
   const [bgVariant, setBgVariant] = useState('default');
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
+    const handleScroll = () => { }; // Placeholder if scrollY is needed later
     window.addEventListener("scroll", handleScroll);
 
     // Intersection Observer for Background Switching
@@ -109,7 +107,7 @@ function App() {
             className="font-japanese font-bold text-xl tracking-tighter text-white cursor-pointer"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
-            SHIVA
+            <LiquidText>SHIVA</LiquidText>
           </span>
         </div>
 
@@ -117,12 +115,12 @@ function App() {
         <div className="fixed top-8 right-8 z-50 flex items-center gap-6 mix-blend-difference">
           {SOCIAL_LINKS.map((link) => (
             <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors font-japanese text-xs uppercase tracking-widest">
-              {link.name}
+              <LiquidText>{link.name}</LiquidText>
             </a>
           ))}
           <div className="h-4 w-[1px] bg-white/20"></div>
           <a href={HERO_CONTENT.resumeLink} className="text-white/70 hover:text-white transition-colors font-japanese text-xs uppercase tracking-widest cursor-pointer">
-            Resume
+            <LiquidText>Resume</LiquidText>
           </a>
         </div>
 
@@ -137,19 +135,21 @@ function App() {
             className="text-center relative z-10 flex flex-col items-center justify-center h-full pt-32"
           >
             {/* Huge Title with Blur/Glow Effect */}
-            <h1
-              className="font-japanese text-[10rem] md:text-[13rem] leading-none font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/80 mix-blend-overlay"
-              style={{
-                filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.5)) blur(1px)',
-                WebkitTextStroke: '1px rgba(255,255,255,0.2)'
-              }}
-            >
-              {HERO_CONTENT.name}
-            </h1>
+            <LiquidText>
+              <h1
+                className="font-japanese text-[10rem] md:text-[13rem] leading-none font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/80 mix-blend-overlay"
+                style={{
+                  filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.5)) blur(1px)',
+                  WebkitTextStroke: '1px rgba(255,255,255,0.2)'
+                }}
+              >
+                {HERO_CONTENT.name}
+              </h1>
+            </LiquidText>
 
             {/* Subtitle */}
             <p className="font-japanese text-xl md:text-2xl text-white/90 mt-8 mb-24 tracking-widest uppercase font-light">
-              {HERO_CONTENT.tagline}
+              <LiquidText>{HERO_CONTENT.tagline}</LiquidText>
             </p>
 
             {/* Action Buttons: Journey | Works */}
@@ -158,7 +158,7 @@ function App() {
                 onClick={() => document.getElementById('journey').scrollIntoView({ behavior: 'smooth' })}
                 className="px-6 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-japanese text-base hover:bg-white/10 transition-all duration-300 min-w-[120px]"
               >
-                Journey
+                <LiquidText>Journey</LiquidText>
               </MagneticButton>
 
               <div className="h-8 w-[1px] bg-white/20"></div>
@@ -167,13 +167,13 @@ function App() {
                 onClick={() => document.getElementById('projects').scrollIntoView({ behavior: 'smooth' })}
                 className="px-6 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-japanese text-base hover:bg-white/10 transition-all duration-300 min-w-[120px]"
               >
-                Works
+                <LiquidText>Works</LiquidText>
               </MagneticButton>
             </div>
 
             {/* Small Description at bottom */}
             <p className="absolute bottom-12 text-white/40 font-japanese text-xs max-w-md leading-relaxed">
-              {HERO_CONTENT.description}
+              <LiquidText>{HERO_CONTENT.description}</LiquidText>
             </p>
           </motion.div>
         </Section>
@@ -186,7 +186,7 @@ function App() {
               whileInView={{ opacity: 1, y: 0 }}
               className="font-japanese text-4xl md:text-5xl font-bold text-white mb-16 text-center"
             >
-              Journey
+              <LiquidText>Journey</LiquidText>
             </motion.h2>
 
             <div className="relative border-l-2 border-white/10 ml-4 md:ml-0 space-y-12">
@@ -202,10 +202,10 @@ function App() {
                   <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#FFD700] shadow-[0_0_10px_#FFD700] group-hover:scale-125 transition-transform duration-300" />
 
                   <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-6 rounded-2xl hover:bg-black/50 transition-all duration-300">
-                    <span className="font-japanese text-[#FFD700] text-sm tracking-wider mb-2 block">{item.year}</span>
-                    <h3 className="font-japanese text-xl font-bold text-white mb-1" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{item.title}</h3>
-                    <p className="font-japanese text-white/80 text-sm mb-2">{item.institution || item.project || item.event}</p>
-                    <p className="font-japanese text-white/60 text-sm leading-relaxed">{item.description}</p>
+                    <span className="font-japanese text-[#FFD700] text-sm tracking-wider mb-2 block"><LiquidText>{item.year}</LiquidText></span>
+                    <h3 className="font-japanese text-xl font-bold text-white mb-1" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}><LiquidText>{item.title}</LiquidText></h3>
+                    <p className="font-japanese text-white/80 text-sm mb-2"><LiquidText>{item.institution || item.project || item.event}</LiquidText></p>
+                    <p className="font-japanese text-white/60 text-sm leading-relaxed"><LiquidText>{item.description}</LiquidText></p>
                   </div>
                 </motion.div>
               ))}
@@ -221,7 +221,7 @@ function App() {
               whileInView={{ opacity: 1, y: 0 }}
               className="font-japanese text-4xl md:text-5xl font-bold text-black mb-16 text-center"
             >
-              Selected Works
+              <LiquidText>Selected Works</LiquidText>
             </motion.h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -234,22 +234,22 @@ function App() {
                     className="bg-black/60 backdrop-blur-md border border-white/10 p-6 rounded-2xl h-full hover:border-white/30 transition-all duration-300 group"
                   >
                     <div className="flex justify-between items-start mb-4">
-                      <h3 className="font-japanese text-xl font-bold text-white group-hover:text-[#FFD700] transition-colors">{project.title}</h3>
+                      <h3 className="font-japanese text-xl font-bold text-white group-hover:text-[#FFD700] transition-colors"><LiquidText>{project.title}</LiquidText></h3>
                       <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-white transition-colors">
                         <FaGithub size={20} />
                       </a>
                     </div>
-                    <p className="font-japanese text-white/60 text-sm mb-6 leading-relaxed h-20 overflow-hidden">{project.description}</p>
+                    <p className="font-japanese text-white/60 text-sm mb-6 leading-relaxed h-20 overflow-hidden"><LiquidText>{project.description}</LiquidText></p>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {project.tech.map((t) => (
                         <span key={t} className="px-2 py-1 rounded-md bg-white/5 border border-white/5 text-xs text-white/50 font-japanese">
-                          {t}
+                          <LiquidText>{t}</LiquidText>
                         </span>
                       ))}
                     </div>
                     <div className="pt-4 border-t border-white/5 flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: project.color }} />
-                      <span className="font-japanese text-xs text-white/40">{project.stat}</span>
+                      <span className="font-japanese text-xs text-white/40"><LiquidText>{project.stat}</LiquidText></span>
                     </div>
                   </motion.div>
                 </Tilt>
@@ -260,7 +260,7 @@ function App() {
 
         {/* Footer */}
         <footer className="py-12 text-center text-gray-500 text-sm relative z-10">
-          <p>&copy; {new Date().getFullYear()} Shiva. Built with React, Three.js & Antigravity.</p>
+          <p><LiquidText>&copy; {new Date().getFullYear()} Shiva. Built with React, Three.js & Antigravity.</LiquidText></p>
         </footer>
 
       </main>
