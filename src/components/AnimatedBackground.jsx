@@ -1,66 +1,10 @@
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useTexture } from '@react-three/drei';
+import { useTexture, useVideoTexture } from '@react-three/drei';
 import { Vector2 } from 'three';
 import bgImage from '../assets/bg-dark-splash.png';
-
-const FlowerCaveShader = {
-  uniforms: {
-    uTime: { value: 0 },
-    uResolution: { value: new Vector2(1, 1) },
-    uMouse: { value: new Vector2(0.5, 0.5) },
-    uOpacity: { value: 0.0 }
-  },
-  vertexShader: `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-  fragmentShader: `
-    uniform float uTime;
-    uniform vec2 uResolution;
-    uniform float uOpacity;
-    varying vec2 vUv;
-
-    // Palette function for organic colors
-    vec3 palette( float t ) {
-        vec3 a = vec3(0.5, 0.5, 0.5);
-        vec3 b = vec3(0.5, 0.5, 0.5);
-        vec3 c = vec3(1.0, 1.0, 1.0);
-        vec3 d = vec3(0.263,0.416,0.557);
-        return a + b*cos( 6.28318*(c*t+d) );
-    }
-
-    void main() {
-        vec2 uv = (vUv - 0.5) * 2.0;
-        uv.x *= uResolution.x / uResolution.y;
-        
-        vec2 uv0 = uv;
-        vec3 finalColor = vec3(0.0);
-        
-        for (float i = 0.0; i < 4.0; i++) {
-            uv = fract(uv * 1.5) - 0.5;
-
-            float d = length(uv) * exp(-length(uv0));
-
-            // Slower animation: uTime * 0.1 instead of 0.4
-            vec3 col = palette(length(uv0) + i*.4 + uTime*.1);
-
-            d = sin(d*8. + uTime)/8.;
-            d = abs(d);
-
-            d = pow(0.01 / d, 1.2);
-
-            finalColor += col * d;
-        }
-        
-        // Darken for background usage
-        gl_FragColor = vec4(finalColor * 0.3, uOpacity);
-    }
-  `
-};
+import flowerCaveVideo from '../assets/flower_cave.mp4';
+import journeyVideo from '../assets/journey_bg.mp4';
 
 const FluidImageShader = {
   uniforms: {
@@ -215,6 +159,33 @@ const BackgroundMesh = ({ shader, opacity, texture }) => {
   );
 };
 
+const VideoMesh = ({ video, opacity }) => {
+  const texture = useVideoTexture(video, {
+    start: true,
+    muted: true,
+    loop: true,
+    playsInline: true,
+    crossOrigin: 'Anonymous'
+  });
+
+  const mesh = useRef();
+  const { size, viewport } = useThree();
+
+  useFrame(() => {
+    if (mesh.current) {
+      // Smooth opacity transition
+      mesh.current.material.opacity += (opacity - mesh.current.material.opacity) * 0.05;
+    }
+  });
+
+  return (
+    <mesh ref={mesh} scale={[viewport.width, viewport.height, 1]}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial map={texture} transparent={true} opacity={0} toneMapped={false} />
+    </mesh>
+  );
+};
+
 const FluidMesh = ({ opacity }) => {
   const texture = useTexture(bgImage);
   return (
@@ -229,17 +200,20 @@ const FluidMesh = ({ opacity }) => {
 const AnimatedBackground = ({ variant = 'default' }) => {
   return (
     <div className="fixed top-0 left-0 w-full h-full -z-10 bg-black">
-      <Canvas camera={{ position: [0, 0, 1] }}>
+      <Canvas
+        camera={{ position: [0, 0, 1] }}
+        dpr={[1, 1.5]} // Limit pixel ratio for performance
+        gl={{ antialias: false, powerPreference: "high-performance" }} // Disable antialiasing for speed
+      >
         <React.Suspense fallback={null}>
           {/* Fluid Background (Default) */}
           <FluidMesh opacity={variant === 'default' ? 1.0 : 0.0} />
 
-          {/* Flower Cave Background (Projects) */}
-          <BackgroundMesh
-            shader={FlowerCaveShader}
-            texture={null}
-            opacity={variant === 'cave' ? 1.0 : 0.0}
-          />
+          {/* Journey Video Background (Timeline) */}
+          <VideoMesh video={journeyVideo} opacity={variant === 'journey' ? 1.0 : 0.0} />
+
+          {/* Flower Cave Video Background (Projects) */}
+          <VideoMesh video={flowerCaveVideo} opacity={variant === 'cave' ? 1.0 : 0.0} />
         </React.Suspense>
       </Canvas>
     </div>

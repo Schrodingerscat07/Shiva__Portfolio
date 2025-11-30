@@ -55,26 +55,32 @@ function App() {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
 
-    // Intersection Observer for Projects Section
+    // Intersection Observer for Background Switching
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setBgVariant('cave');
-        } else {
-          setBgVariant('default');
-        }
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (entry.target.id === 'hero') setBgVariant('default');
+            if (entry.target.id === 'journey') setBgVariant('journey');
+            if (entry.target.id === 'projects') setBgVariant('cave');
+          }
+        });
       },
       { threshold: 0.2 } // Trigger when 20% of the section is visible
     );
 
-    const projectsSection = document.getElementById('projects');
-    if (projectsSection) {
-      observer.observe(projectsSection);
-    }
+    const sections = ['hero', 'journey', 'projects'];
+    sections.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
+    });
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      if (projectsSection) observer.unobserve(projectsSection);
+      sections.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) observer.unobserve(element);
+      });
     };
   }, []);
 
@@ -90,9 +96,12 @@ function App() {
       <main className="relative z-10">
 
         {/* Navigation */}
-        {/* Navigation */}
         {/* Global Blur Overlay */}
-        <div className="fixed inset-0 backdrop-blur-sm pointer-events-none z-0" />
+        {/* Global Blur Overlay - Only visible on Hero (default) */}
+        <div
+          className={`fixed inset-0 pointer-events-none z-0 transition-all duration-1000 ease-in-out ${bgVariant === 'default' ? 'backdrop-blur-sm bg-black/20' : 'backdrop-blur-none bg-transparent'
+            }`}
+        />
         <nav className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-black/20 backdrop-blur-md border border-white/10 rounded-full px-12 py-4 flex gap-12 items-center shadow-lg">
           <span className="font-display font-bold text-2xl tracking-tighter text-white cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>SHIVA</span>
           <div className="h-6 w-[1px] bg-white/20"></div>
@@ -117,7 +126,7 @@ function App() {
           </MagneticButton>
         </nav>
 
-        <Section className="min-h-screen flex items-center justify-center relative overflow-hidden">
+        <Section id="hero" className="min-h-screen flex items-center justify-center relative overflow-hidden">
           {/* Gradient Overlay for contrast */}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/60 pointer-events-none z-0" />
 
@@ -144,25 +153,73 @@ function App() {
 
         {/* Timeline Section */}
         <Section className="py-20" id="journey">
-          <h2 className="font-display text-3xl font-bold mb-16 text-center italic text-white/70 hover:text-white transition-colors duration-300">Journey</h2>
-          <div className="relative border-l border-white/10 ml-4 md:ml-0 space-y-12">
-            {TIMELINE_DATA.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="mb-10 ml-8 relative group"
-              >
-                <div className="absolute -left-10 mt-1.5 w-4 h-4 rounded-full bg-blue-500 border-4 border-black shadow-sm" />
-                <span className="text-sm text-blue-400 font-mono font-bold">{item.year}</span>
-                <h3 className="font-display text-xl font-bold mt-1 text-white/80 group-hover:text-white transition-colors duration-300">{item.title}</h3>
-                {item.institution && <p className="text-white/60 group-hover:text-white transition-colors duration-300 text-sm">{item.institution}</p>}
-                {item.project && <p className="text-white/60 group-hover:text-white transition-colors duration-300 text-sm italic">{item.project}</p>}
-                {item.event && <p className="text-white/60 group-hover:text-white transition-colors duration-300 text-sm italic">{item.event}</p>}
-                <p className="text-white/60 group-hover:text-white transition-colors duration-300 mt-2 max-w-md">{item.description}</p>
-              </motion.div>
-            ))}
+          <h2 className="font-display text-4xl font-bold mb-20 text-center italic text-white/90 hover:text-white transition-colors duration-300 drop-shadow-lg">Journey</h2>
+
+          <div className="relative max-w-4xl mx-auto px-4">
+            {/* Continuous Line Background */}
+            <div className="absolute left-[27px] top-0 bottom-0 w-[2px] bg-white/10 md:left-1/2 md:-ml-[1px]" />
+
+            <div className="space-y-16">
+              {TIMELINE_DATA.map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className={`relative flex flex-col md:flex-row gap-8 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
+                >
+                  {/* Timeline Marker */}
+                  <div className="absolute left-[19px] top-0 md:left-1/2 md:-ml-[8px] z-10">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      whileInView={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 10, delay: 0.2 }}
+                      className="w-4 h-4 rounded-full border-2 border-black shadow-[0_0_10px_rgba(255,215,0,0.5)]"
+                      style={{ backgroundColor: '#FFD700' }} // Gold
+                    >
+                      <motion.div
+                        animate={{ scale: [1, 1.5, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="w-full h-full rounded-full bg-white/30"
+                      />
+                    </motion.div>
+                  </div>
+
+                  {/* Content Card */}
+                  <div className="ml-12 md:ml-0 md:w-1/2">
+                    <div className={`p-6 rounded-xl border border-white/10 backdrop-blur-sm relative overflow-hidden group hover:border-[#FFD700]/30 transition-colors duration-500
+                      ${index % 2 === 0 ? 'md:mr-12' : 'md:ml-12'}`}
+                      style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }} // Dark overlay on content only
+                    >
+                      {/* Inner Highlight */}
+                      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                      <span className="inline-block px-3 py-1 rounded-full bg-[#FFD700]/10 border border-[#FFD700]/20 text-[#FFD700] text-xs font-mono font-bold mb-3">
+                        {item.year}
+                      </span>
+
+                      <h3 className="font-display text-2xl font-bold text-white mb-1" style={{ textShadow: '1px 1px 3px #000000' }}>
+                        {item.title}
+                      </h3>
+
+                      {(item.institution || item.project || item.event) && (
+                        <p className="text-white/80 text-sm font-medium mb-3 italic">
+                          {item.institution || item.project || item.event}
+                        </p>
+                      )}
+
+                      <p className="text-white/60 text-sm leading-relaxed font-light">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Empty space for the other side */}
+                  <div className="hidden md:block md:w-1/2" />
+                </motion.div>
+              ))}
+            </div>
           </div>
         </Section>
 
