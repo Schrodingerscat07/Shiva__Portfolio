@@ -128,7 +128,7 @@ const AnimatedBackground = ({ variant = 'default' }) => {
     <div className="fixed top-0 left-0 w-full h-full -z-10 bg-black">
       <Canvas
         camera={{ position: [0, 0, 1] }}
-        dpr={[1, 1.5]}
+        dpr={[1, 1]}
         gl={{ antialias: false, powerPreference: "high-performance" }}
         eventSource={document.body}
         eventPrefix="client"

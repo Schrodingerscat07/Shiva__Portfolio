@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const LiquidFilter = () => {
-    const [freq, setFreq] = useState("0.01 0.02");
+    const turbulenceRef = useRef(null);
 
     useEffect(() => {
         let frame;
@@ -11,7 +11,11 @@ const LiquidFilter = () => {
             time += 0.005;
             const freqX = 0.01 + Math.sin(time) * 0.005;
             const freqY = 0.02 + Math.cos(time) * 0.005;
-            setFreq(`${freqX} ${freqY}`);
+
+            if (turbulenceRef.current) {
+                turbulenceRef.current.setAttribute("baseFrequency", `${freqX} ${freqY}`);
+            }
+
             frame = requestAnimationFrame(animate);
         };
         animate();
@@ -23,8 +27,9 @@ const LiquidFilter = () => {
             <defs>
                 <filter id="liquid-text-filter">
                     <feTurbulence
+                        ref={turbulenceRef}
                         type="fractalNoise"
-                        baseFrequency={freq}
+                        baseFrequency="0.01 0.02"
                         numOctaves="1"
                         result="warp"
                     />

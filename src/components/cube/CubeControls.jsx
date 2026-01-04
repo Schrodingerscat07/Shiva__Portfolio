@@ -9,28 +9,56 @@ const CubeControls = ({ onRotationChange }) => {
     const requestRef = useRef(null);
 
     useEffect(() => {
+        let isMounted = true;
+
         const initHandLandmarker = async () => {
-            const vision = await FilesetResolver.forVisionTasks(
-                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
-            );
-            handLandmarkerRef.current = await HandLandmarker.createFromOptions(vision, {
-                baseOptions: {
-                    modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
-                    delegate: "GPU"
-                },
-                runningMode: "VIDEO",
-                numHands: 1
-            });
-            startWebcam();
+            try {
+                if (handLandmarkerRef.current) return;
+
+                const vision = await FilesetResolver.forVisionTasks(
+                    "/wasm"
+                );
+
+                if (!isMounted) return;
+
+                handLandmarkerRef.current = await HandLandmarker.createFromOptions(vision, {
+                    baseOptions: {
+                        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
+                        delegate: "GPU"
+                    },
+                    runningMode: "VIDEO",
+                    numHands: 1
+                });
+
+                if (isMounted) {
+                    startWebcam();
+                }
+            } catch (error) {
+                console.error("Error initializing HandLandmarker:", error);
+            }
         };
 
-        initHandLandmarker();
+        if (isMounted) {
+            initHandLandmarker();
+        }
 
         return () => {
+            isMounted = false;
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
             if (videoRef.current && videoRef.current.srcObject) {
-                videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+                const tracks = videoRef.current.srcObject.getTracks();
+                tracks.forEach(track => {
+                    track.stop();
+                    videoRef.current.srcObject.removeTrack(track);
+                });
+                videoRef.current.srcObject = null;
             }
+            // Optional: clean up handLandmarker if it has a close method (it usually doesn't need explicit close, but good to be safe if API changes)
+            if (handLandmarkerRef.current) {
+                handLandmarkerRef.current.close();
+                handLandmarkerRef.current = null;
+            }
+            setWebcamRunning(false);
         };
     }, []);
 
@@ -42,6 +70,8 @@ const CubeControls = ({ onRotationChange }) => {
                     videoRef.current.addEventListener("loadeddata", predictWebcam);
                     setWebcamRunning(true);
                 }
+            }).catch(err => {
+                console.error("Error accessing webcam:", err);
             });
         }
     };
@@ -51,28 +81,21 @@ const CubeControls = ({ onRotationChange }) => {
             let startTimeMs = performance.now();
             if (lastVideoTimeRef.current !== videoRef.current.currentTime) {
                 lastVideoTimeRef.current = videoRef.current.currentTime;
-                const results = handLandmarkerRef.current.detectForVideo(videoRef.current, startTimeMs);
+                try {
+                    const results = handLandmarkerRef.current.detectForVideo(videoRef.current, startTimeMs);
+                    if (results.landmarks && results.landmarks.length > 0) {
+                        const landmarks = results.landmarks[0];
 
-                if (results.landmarks && results.landmarks.length > 0) {
-                    const landmarks = results.landmarks[0];
-                    // Use wrist (0) or index finger tip (8) or center of palm to control rotation
-                    // Let's use the wrist or a calculated center
+                        const x = landmarks[9].x;
+                        const y = landmarks[9].y;
 
-                    // Landmarks are normalized [0, 1]
-                    // x: 0 (left) -> 1 (right)
-                    // y: 0 (top) -> 1 (bottom)
+                        const rotationY = (x - 0.5) * Math.PI * 4;
+                        const rotationX = (y - 0.5) * Math.PI * 4;
 
-                    const x = landmarks[9].x; // Middle finger mcp (center-ish)
-                    const y = landmarks[9].y;
-
-                    // Map to rotation angles
-                    // Center is 0.5, 0.5
-                    // Range: -PI to PI
-
-                    const rotationY = (x - 0.5) * Math.PI * 4; // Horizontal movement rotates around Y axis
-                    const rotationX = (y - 0.5) * Math.PI * 4; // Vertical movement rotates around X axis
-
-                    onRotationChange({ x: rotationX, y: rotationY });
+                        onRotationChange({ x: rotationX, y: rotationY });
+                    }
+                } catch (e) {
+                    console.error("Detection error:", e);
                 }
             }
             requestRef.current = requestAnimationFrame(predictWebcam);
